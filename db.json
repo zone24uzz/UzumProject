@@ -1,0 +1,360 @@
+{
+    "categories": [
+        {
+            "id": "cat-electronics",
+            "name": "Электроника",
+            "slug": "electronics",
+            "icon": "Cpu"
+        },
+        {
+            "id": "cat-clothes",
+            "name": "Одежда",
+            "slug": "clothes",
+            "icon": "Shirt"
+        },
+        {
+            "id": "cat-shoes",
+            "name": "Обувь",
+            "slug": "shoes",
+            "icon": "Footprints"
+        },
+        {
+            "id": "cat-home",
+            "name": "Дом и кухня",
+            "slug": "home-appliances",
+            "icon": "Home"
+        }
+    ],
+    "products": [
+        {
+            "id": "prod-1",
+            "title": "Беспроводные наушники SoundCore X5",
+            "description": "Наушники с активным шумоподавлением (ANC) и временем работы до 40 часов.",
+            "price": 450000,
+            "discountPrice": 399000,
+            "rating": 4.8,
+            "stock": 14,
+            "brand": "SoundCore",
+            "categoryId": "cat-electronics",
+            "images": [
+                "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500"
+            ],
+            "isNew": true,
+            "isTrending": true
+        },
+        {
+            "id": "prod-2",
+            "title": "Худи Оверсайз Neon Cyberpunk",
+            "description": "Плотное хлопковое худи с уникальным неоновым принтом в стиле киберпанк.",
+            "price": 350000,
+            "discountPrice": null,
+            "rating": 4.5,
+            "stock": 25,
+            "brand": "NeonWear",
+            "categoryId": "cat-clothes",
+            "images": [
+                "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500"
+            ],
+            "isNew": false,
+            "isTrending": true
+        },
+        {
+            "id": "prod-3",
+            "title": "Механическая клавиатура KeyChron K2",
+            "description": "Беспроводная механическая клавиатура 75% формата на переключателях Brown.",
+            "price": 1200000,
+            "discountPrice": 1050000,
+            "rating": 4.9,
+            "stock": 5,
+            "brand": "KeyChron",
+            "categoryId": "cat-electronics",
+            "images": [
+                "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=500"
+            ],
+            "isNew": false,
+            "isTrending": false
+        },
+        {
+            "id": "prod-4",
+            "title": "Умная бутылка для воды HydraGlow",
+            "description": "Бутылка из нержавеющей стали с сенсорным экраном температуры на крышке.",
+            "price": 280000,
+            "discountPrice": 199000,
+            "rating": 4.2,
+            "stock": 12,
+            "brand": "HydraTech",
+            "categoryId": "cat-home",
+            "images": [
+                "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500"
+            ],
+            "isNew": true,
+            "isTrending": false
+        },
+        {
+            "id": "prod-5",
+            "title": "Кроссовки SpeedStride Urban v4",
+            "description": "Легкие дышащие кроссовки для бега и повседневной ходьбы.",
+            "price": 600000,
+            "discountPrice": 540000,
+            "rating": 4.6,
+            "stock": 40,
+            "brand": "SpeedStride",
+            "categoryId": "cat-shoes",
+            "images": [
+                "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500"
+            ],
+            "isNew": false,
+            "isTrending": true
+        },
+        {
+            "id": "prod-6",
+            "title": "Игровая мышь Apex Quantum RGB",
+            "description": "Эргономичная мышь с оптическим сенсором 16000 DPI и гибким кабелем.",
+            "price": 320000,
+            "discountPrice": 290000,
+            "rating": 4.7,
+            "stock": 18,
+            "brand": "Apex",
+            "categoryId": "cat-electronics",
+            "images": [
+                "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500"
+            ],
+            "isNew": true,
+            "isTrending": true
+        },
+        {
+            "id": "prod-7",
+            "title": "Футболка EcoLife Базовая Белая",
+            "description": "Минималистичная футболка из 100% органического гипоаллергенного хлопка.",
+            "price": 120000,
+            "discountPrice": null,
+            "rating": 4.4,
+            "stock": 50,
+            "brand": "EcoLife",
+            "categoryId": "cat-clothes",
+            "images": [
+                "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500"
+            ],
+            "isNew": false,
+            "isTrending": false
+        },
+        {
+            "id": "prod-8",
+            "title": "Кожаные ботинки Vortex Winter",
+            "description": "Зимние ботинки из натуральной кожи с подкладкой из плотной шерсти.",
+            "price": 850000,
+            "discountPrice": 790000,
+            "rating": 4.5,
+            "stock": 8,
+            "brand": "Vortex",
+            "categoryId": "cat-shoes",
+            "images": [
+                "https://images.unsplash.com/photo-1520639888713-7851133b1ed0?w=500"
+            ],
+            "isNew": false,
+            "isTrending": false
+        },
+        {
+            "id": "prod-9",
+            "title": "Ультразвуковой увлажнитель Z-Light",
+            "description": "Бесшумный увлажнитель воздуха с функцией ароматизации и ночной подсветкой.",
+            "price": 390000,
+            "discountPrice": 340000,
+            "rating": 4.3,
+            "stock": 22,
+            "brand": "Z-Light",
+            "categoryId": "cat-home",
+            "images": [
+                "https://images.unsplash.com/photo-1519558260268-cde7e03a0152?w=500"
+            ],
+            "isNew": true,
+            "isTrending": false
+        },
+        {
+            "id": "prod-10",
+            "title": "Умные часы Quantum Fit Pro",
+            "description": "Фитнес-трекер с AMOLED экраном, измерением пульса и защитой от воды 5ATM.",
+            "price": 750000,
+            "discountPrice": null,
+            "rating": 4.6,
+            "stock": 15,
+            "brand": "Quantum",
+            "categoryId": "cat-electronics",
+            "images": [
+                "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=500"
+            ],
+            "isNew": false,
+            "isTrending": true
+        },
+        {
+            "id": "prod-11",
+            "title": "Свитшот Urban Спортивный Серый",
+            "description": "Удобный повседневный свитшот без начеса, идеально для весенних вечеров.",
+            "price": 240000,
+            "discountPrice": 199000,
+            "rating": 4.5,
+            "stock": 33,
+            "brand": "NeonWear",
+            "categoryId": "cat-clothes",
+            "images": [
+                "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=500"
+            ],
+            "isNew": true,
+            "isTrending": false
+        },
+        {
+            "id": "prod-12",
+            "title": "Кеды классические Apex Canvas",
+            "description": "Текстильные легкие кеды на прочной резиновой подошве.",
+            "price": 180000,
+            "discountPrice": null,
+            "rating": 4.2,
+            "stock": 60,
+            "brand": "Apex",
+            "categoryId": "cat-shoes",
+            "images": [
+                "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500"
+            ],
+            "isNew": false,
+            "isTrending": false
+        },
+        {
+            "id": "prod-13",
+            "title": "Капельная кофеварка EcoLife Coffee",
+            "description": "Компактная кофеварка с многоразовым фильтром и автоподогревом готового напитка.",
+            "price": 480000,
+            "discountPrice": 420000,
+            "rating": 4.7,
+            "stock": 7,
+            "brand": "EcoLife",
+            "categoryId": "cat-home",
+            "images": [
+                "https://images.unsplash.com/photo-1517256064527-09c53b2d0c6b?w=500"
+            ],
+            "isNew": false,
+            "isTrending": true
+        },
+        {
+            "id": "prod-14",
+            "title": "Монитор игровой Vortex Horizon 27",
+            "description": "IPS матрица, 165Hz частота обновления экрана, 1ms время отклика для про-гейминга.",
+            "price": 2900000,
+            "discountPrice": 2650000,
+            "rating": 4.9,
+            "stock": 4,
+            "brand": "Vortex",
+            "categoryId": "cat-electronics",
+            "images": [
+                "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=500"
+            ],
+            "isNew": true,
+            "isTrending": true
+        },
+        {
+            "id": "prod-15",
+            "title": "Джинсы Slim Fit Denim",
+            "description": "Классические зауженные темно-синие джинсы из плотного стрейч-денима.",
+            "price": 310000,
+            "discountPrice": null,
+            "rating": 4.4,
+            "stock": 29,
+            "brand": "SpeedStride",
+            "categoryId": "cat-clothes",
+            "images": [
+                "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=500"
+            ],
+            "isNew": false,
+            "isTrending": false
+        },
+        {
+            "id": "prod-16",
+            "title": "Портативная колонка SoundCore Boom",
+            "description": "Мощный беспроводной звук, защита от воды IPX7, глубокий бас BassUp.",
+            "price": 890000,
+            "discountPrice": 799000,
+            "rating": 4.8,
+            "stock": 11,
+            "brand": "SoundCore",
+            "categoryId": "cat-electronics",
+            "images": [
+                "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=500"
+            ],
+            "isNew": false,
+            "isTrending": true
+        },
+        {
+            "id": "prod-17",
+            "title": "Куртка ветровка Quantum Shield",
+            "description": "Непромокаемая легкая ветровка с мембранной защитой от сильного ветра и дождя.",
+            "price": 550000,
+            "discountPrice": 490000,
+            "rating": 4.6,
+            "stock": 16,
+            "brand": "Quantum",
+            "categoryId": "cat-clothes",
+            "images": [
+                "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=500"
+            ],
+            "isNew": true,
+            "isTrending": false
+        },
+        {
+            "id": "prod-18",
+            "title": "Летние сланцы Apex Breeze",
+            "description": "Максимально легкие анатомические шлепанцы из качественного ЭВА-материала.",
+            "price": 950000,
+            "discountPrice": 75000,
+            "rating": 4.1,
+            "stock": 80,
+            "brand": "Apex",
+            "categoryId": "cat-shoes",
+            "images": [
+                "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=500"
+            ],
+            "isNew": true,
+            "isTrending": false
+        },
+        {
+            "id": "prod-19",
+            "title": "Робот-пылесос HydraClean Smart v2",
+            "description": "Сухая и влажная уборка, построение карты помещения через лидар-датчик.",
+            "price": 2400000,
+            "discountPrice": 2100000,
+            "rating": 4.8,
+            "stock": 6,
+            "brand": "HydraTech",
+            "categoryId": "cat-home",
+            "images": [
+                "https://images.unsplash.com/photo-1518133683791-0b9de5a055f0?w=500"
+            ],
+            "isNew": false,
+            "isTrending": true
+        },
+        {
+            "id": "prod-20",
+            "title": "Внешний аккумулятор PowerBank 20000",
+            "description": "Быстрая зарядка Power Delivery 22.5W, три выходных разъема для девайсов.",
+            "price": 260000,
+            "discountPrice": null,
+            "rating": 4.7,
+            "stock": 45,
+            "brand": "Z-Light",
+            "categoryId": "cat-electronics",
+            "images": [
+                "https://images.unsplash.com/photo-1609592424085-f68804791e8d?w=500"
+            ],
+            "isNew": false,
+            "isTrending": false
+        }
+    ],
+    "users": [
+        {
+            "id": "user-1",
+            "name": "Покупатель",
+            "email": "customer@example.com",
+            "role": "customer"
+        }
+    ],
+    "cart": [],
+    "orders": []
+}
