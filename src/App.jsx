@@ -1,7 +1,9 @@
 import { Routes, Route } from 'react-router-dom'
 import { CartProvider } from './context/CartContext'
+import { AuthProvider } from './context/AuthContext'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import AuthModal from './components/AuthModal'
 import HomePage from './pages/HomePage'
 import ProductPage from './pages/ProductPage'
 import CategoryPage from './pages/CategoryPage'
@@ -15,22 +17,26 @@ const { products, categories } = data
 
 export default function App() {
   return (
-    <CartProvider>
-      <div className="min-h-screen flex flex-col bg-gray-50">
-        <Header categories={categories} />
-        <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<HomePage products={products} categories={categories} />} />
-            <Route path="/product/:id" element={<ProductPage products={products} />} />
-            <Route path="/category/:slug" element={<CategoryPage products={products} categories={categories} />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/wishlist" element={<WishlistPage />} />
-            <Route path="/search" element={<SearchPage products={products} />} />
-            <Route path="/profile" element={<ProfilePage />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <div className="min-h-screen flex flex-col" style={{ background: 'transparent' }}>
+          <Header categories={categories} />
+          <main className="flex-1">
+            <Routes>
+              <Route path="/" element={<HomePage products={products} categories={categories} />} />
+              <Route path="/product/:id" element={<ProductPage products={products} />} />
+              <Route path="/category/:slug" element={<CategoryPage products={products} categories={categories} />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/wishlist" element={<WishlistPage />} />
+              <Route path="/search" element={<SearchPage products={products} />} />
+              <Route path="/profile" element={<ProfilePage />} />
+            </Routes>
+          </main>
+          <Footer />
+          {/* Глобальное модальное окно авторизации */}
+          <AuthModal />
+        </div>
+      </CartProvider>
+    </AuthProvider>
   )
 }

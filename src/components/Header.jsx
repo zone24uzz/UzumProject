@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ShoppingCart, Heart, Search, Menu, MapPin, ChevronDown, User, Phone, Check } from 'lucide-react'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 
 const CITIES = [
   'Ташкент',
@@ -18,6 +19,7 @@ const CITIES = [
 
 export default function Header({ categories }) {
   const { cartCount, wishlist } = useCart()
+  const { user, openAuth } = useAuth()
   const [q, setQ] = useState('')
   const [city, setCity] = useState('Ташкент')
   const [cityOpen, setCityOpen] = useState(false)
@@ -129,8 +131,27 @@ export default function Header({ categories }) {
       <div className="header-main">
 
         {/* Logo */}
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', flexShrink: 0 }}>
-          <div style={{ width: 38, height: 38, background: '#7B2FBE', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Link
+          to="/"
+          style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', flexShrink: 0 }}
+          onMouseEnter={e => {
+            const box = e.currentTarget.querySelector('[data-logo-box]')
+            if (box) box.style.animation = 'logoSpin 0.6s cubic-bezier(0.34,1.56,0.64,1)'
+          }}
+          onMouseLeave={e => {
+            const box = e.currentTarget.querySelector('[data-logo-box]')
+            if (box) box.style.animation = 'none'
+          }}
+        >
+          <div
+            data-logo-box
+            style={{
+              width: 38, height: 38, background: '#7B2FBE', borderRadius: 10,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 16px rgba(123,47,190,0.4)',
+              transformStyle: 'preserve-3d',
+            }}
+          >
             <span style={{ color: '#fff', fontWeight: 900, fontSize: 16 }}>U</span>
           </div>
           <span style={{ color: '#7B2FBE', fontWeight: 900, fontSize: 24, letterSpacing: '-0.5px' }}>uzum</span>
@@ -180,7 +201,6 @@ export default function Header({ categories }) {
           {[
             { to: '/wishlist', icon: <Heart size={24} />, label: 'Избранное', badge: wishlist.length, badgeColor: '#ef4444' },
             { to: '/cart', icon: <ShoppingCart size={24} />, label: 'Корзина', badge: cartCount, badgeColor: '#7B2FBE' },
-            { to: '/profile', icon: <User size={24} />, label: 'Войти', badge: 0, badgeColor: '' },
           ].map(({ to, icon, label, badge, badgeColor }) => (
             <Link
               key={to}
@@ -192,18 +212,35 @@ export default function Header({ categories }) {
               <div style={{ position: 'relative' }}>
                 {icon}
                 {badge > 0 && (
-                  <span style={{
-                    position: 'absolute', top: -6, right: -6,
-                    background: badgeColor, color: '#fff',
-                    fontSize: 10, fontWeight: 700,
-                    borderRadius: '50%', width: 18, height: 18,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center'
-                  }}>{badge}</span>
+                  <span style={{ position: 'absolute', top: -6, right: -6, background: badgeColor, color: '#fff', fontSize: 10, fontWeight: 700, borderRadius: '50%', width: 18, height: 18, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{badge}</span>
                 )}
               </div>
               <span className="header-action-label">{label}</span>
             </Link>
           ))}
+
+          {/* Аватар / Войти */}
+          {user ? (
+            <Link to="/profile" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, textDecoration: 'none', color: '#555', transition: 'color 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#7B2FBE'}
+              onMouseLeave={e => e.currentTarget.style.color = '#555'}
+            >
+              <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg, #7B2FBE, #9b4fd4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11, fontWeight: 800 }}>
+                {user.name?.charAt(0).toUpperCase() || 'U'}
+              </div>
+              <span className="header-action-label">{user.name?.split(' ')[0]}</span>
+            </Link>
+          ) : (
+            <button
+              onClick={() => openAuth('login')}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', color: '#555', transition: 'color 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#7B2FBE'}
+              onMouseLeave={e => e.currentTarget.style.color = '#555'}
+            >
+              <User size={24} />
+              <span className="header-action-label">Войти</span>
+            </button>
+          )}
         </div>
       </div>
 

@@ -34,8 +34,10 @@ export function CartProvider({ children }) {
   const cartCount = cartItems.reduce((sum, i) => sum + i.qty, 0)
   const cartTotal = cartItems.reduce((sum, i) => sum + (i.discountPrice || i.price) * i.qty, 0)
 
+  const clearCart = () => setCartItems([])
+
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQty, wishlist, toggleWishlist, isInWishlist, cartCount, cartTotal }}>
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQty, clearCart, wishlist, toggleWishlist, isInWishlist, cartCount, cartTotal }}>
       {children}
     </CartContext.Provider>
   )

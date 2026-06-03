@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { BsFire, BsStars, BsLightningChargeFill } from 'react-icons/bs'
 
@@ -51,81 +51,189 @@ const btnStyle = {
   alignItems: 'center',
   justifyContent: 'center',
   cursor: 'pointer',
-  transition: 'background 0.2s',
+  transition: 'background 0.2s, transform 0.2s',
 }
 
 export default function Banner() {
   const [current, setCurrent] = useState(0)
+  const [prev, setPrev] = useState(null)
+  const bannerRef = useRef(null)
+  const mousePos = useRef({ x: 0.5, y: 0.5 })
+  const rafRef = useRef(null)
 
   useEffect(() => {
-    const t = setInterval(() => setCurrent(p => (p + 1) % banners.length), 4500)
+    const t = setInterval(() => goNext(), 4500)
     return () => clearInterval(t)
+  }, [current])
+
+  // Parallax mouse tracking (throttled via rAF)
+  useEffect(() => {
+    const el = bannerRef.current
+    if (!el) return
+    const onMove = (e) => {
+      const rect = el.getBoundingClientRect()
+      mousePos.current = {
+        x: (e.clientX - rect.left) / rect.width,
+        y: (e.clientY - rect.top) / rect.height,
+      }
+      if (!rafRef.current) {
+        rafRef.current = requestAnimationFrame(() => {
+          const orbs = el.querySelectorAll('[data-orb]')
+          orbs.forEach((orb, i) => {
+            const depth = (i + 1) * 18
+            const dx = (mousePos.current.x - 0.5) * depth
+            const dy = (mousePos.current.y - 0.5) * depth
+            orb.style.transform = `translate(${dx}px, ${dy}px)`
+          })
+          rafRef.current = null
+        })
+      }
+    }
+    el.addEventListener('mousemove', onMove, { passive: true })
+    return () => { el.removeEventListener('mousemove', onMove); if (rafRef.current) cancelAnimationFrame(rafRef.current) }
   }, [])
 
-  const prev = () => setCurrent(p => (p - 1 + banners.length) % banners.length)
-  const next = () => setCurrent(p => (p + 1) % banners.length)
+  const goPrev = () => {
+    setPrev(current)
+    setCurrent(p => (p - 1 + banners.length) % banners.length)
+  }
+
+  const goNext = () => {
+    setPrev(current)
+    setCurrent(p => (p + 1) % banners.length)
+  }
 
   return (
-    <div style={{ position: 'relative', borderRadius: 20, overflow: 'hidden' }} className="banner-height">
+    <div
+      ref={bannerRef}
+      style={{ position: 'relative', borderRadius: 20, overflow: 'hidden' }}
+      className="banner-height"
+    >
+      {banners.map((b, i) => {
+        const isActive = i === current
+        return (
+          <div
+            key={b.id}
+            style={{
+              position: 'absolute', inset: 0, zIndex: 1,
+              opacity: isActive ? 1 : 0,
+              transform: isActive ? 'scale(1)' : 'scale(1.03)',
+              transition: 'opacity 0.7s ease, transform 0.7s ease',
+              background: b.gradient,
+              pointerEvents: isActive ? 'auto' : 'none',
+            }}
+          >
+            <img
+              src={b.img}
+              alt={b.title}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'overlay', opacity: 0.2 }}
+            />
 
-      {/* Slides */}
-      {banners.map((b, i) => (
-        <div
-          key={b.id}
-          style={{
-            position: 'absolute', inset: 0, zIndex: 1,
-            opacity: i === current ? 1 : 0,
-            transition: 'opacity 0.7s ease',
-            background: b.gradient,
-            pointerEvents: i === current ? 'auto' : 'none',
-          }}
-        >
-          <img
-            src={b.img}
-            alt={b.title}
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'overlay', opacity: 0.2 }}
-          />
-          <div style={{ position: 'absolute', right: -40, top: -40, width: 280, height: 280, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
-          <div style={{ position: 'absolute', right: 60, bottom: -80, width: 320, height: 320, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
+            {/* Parallax orbs */}
+            <div
+              data-orb="1"
+              style={{
+                position: 'absolute', right: -40, top: -40,
+                width: 300, height: 300, borderRadius: '50%',
+                background: 'rgba(255,255,255,0.07)',
+                transition: 'transform 0.1s linear',
+                animation: isActive ? 'orbFloat1 8s ease-in-out infinite' : 'none',
+              }}
+            />
+            <div
+              data-orb="2"
+              style={{
+                position: 'absolute', right: 60, bottom: -80,
+                width: 360, height: 360, borderRadius: '50%',
+                background: 'rgba(255,255,255,0.04)',
+                transition: 'transform 0.1s linear',
+                animation: isActive ? 'orbFloat2 10s ease-in-out infinite' : 'none',
+              }}
+            />
+            <div
+              data-orb="3"
+              style={{
+                position: 'absolute', left: '40%', top: '10%',
+                width: 120, height: 120, borderRadius: '50%',
+                background: 'rgba(255,255,255,0.05)',
+                transition: 'transform 0.1s linear',
+                animation: isActive ? 'orbFloat1 6s ease-in-out infinite 1s' : 'none',
+              }}
+            />
 
-          <div className="banner-content" style={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <span style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              background: 'rgba(255,255,255,0.2)', color: '#fff',
-              fontSize: 11, fontWeight: 700, padding: '5px 14px',
-              borderRadius: 20, marginBottom: 16, letterSpacing: '0.5px', width: 'fit-content'
-            }}>
-              <b.BadgeIcon size={13} />
-              {b.badge}
-            </span>
-            <h2 className="banner-title" style={{ color: '#fff', fontWeight: 900, lineHeight: 1.1, marginBottom: 12 }}>{b.title}</h2>
-            <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 16, marginBottom: 24 }}>{b.subtitle}</p>
-            <button style={{
-              background: '#fff', color: '#7B2FBE', fontWeight: 700, fontSize: 14,
-              padding: '12px 28px', borderRadius: 12, border: 'none', cursor: 'pointer', width: 'fit-content'
-            }}>
-              {b.cta}
-            </button>
+            <div className="banner-content" style={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <span
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  background: 'rgba(255,255,255,0.2)', color: '#fff',
+                  fontSize: 11, fontWeight: 700, padding: '5px 14px',
+                  borderRadius: 20, marginBottom: 16, letterSpacing: '0.5px', width: 'fit-content',
+                  opacity: isActive ? 1 : 0,
+                  transform: isActive ? 'translateY(0) rotateX(0deg)' : 'translateY(20px) rotateX(20deg)',
+                  transition: 'opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s',
+                }}
+              >
+                <b.BadgeIcon size={13} />
+                {b.badge}
+              </span>
+              <h2
+                className="banner-title"
+                style={{
+                  color: '#fff', fontWeight: 900, lineHeight: 1.1, marginBottom: 12,
+                  opacity: isActive ? 1 : 0,
+                  transform: isActive ? 'translateY(0) rotateX(0deg)' : 'translateY(30px) rotateX(15deg)',
+                  transition: 'opacity 0.55s ease 0.2s, transform 0.55s ease 0.2s',
+                  textShadow: '0 4px 24px rgba(0,0,0,0.25)',
+                }}
+              >
+                {b.title}
+              </h2>
+              <p
+                style={{
+                  color: 'rgba(255,255,255,0.75)', fontSize: 16, marginBottom: 24,
+                  opacity: isActive ? 1 : 0,
+                  transform: isActive ? 'translateY(0)' : 'translateY(20px)',
+                  transition: 'opacity 0.55s ease 0.3s, transform 0.55s ease 0.3s',
+                }}
+              >
+                {b.subtitle}
+              </p>
+              <button
+                style={{
+                  background: '#fff', color: '#7B2FBE', fontWeight: 700, fontSize: 14,
+                  padding: '12px 28px', borderRadius: 12, border: 'none', cursor: 'pointer',
+                  width: 'fit-content',
+                  opacity: isActive ? 1 : 0,
+                  transform: isActive ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.95)',
+                  transition: 'opacity 0.55s ease 0.4s, transform 0.55s ease 0.4s, box-shadow 0.2s',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px) scale(1.04)'; e.currentTarget.style.boxShadow = '0 10px 32px rgba(0,0,0,0.25)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0) scale(1)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)' }}
+              >
+                {b.cta}
+              </button>
+            </div>
           </div>
-        </div>
-      ))}
+        )
+      })}
 
       {/* Prev arrow */}
       <button
-        onClick={prev}
+        onClick={goPrev}
         style={{ ...btnStyle, left: 16 }}
-        onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.38)'}
-        onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.22)'}
+        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.38)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)' }}
+        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.22)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1)' }}
       >
         <ChevronLeft size={22} />
       </button>
 
       {/* Next arrow */}
       <button
-        onClick={next}
+        onClick={goNext}
         style={{ ...btnStyle, right: 16 }}
-        onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.38)'}
-        onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.22)'}
+        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.38)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)' }}
+        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.22)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1)' }}
       >
         <ChevronRight size={22} />
       </button>
@@ -135,7 +243,7 @@ export default function Banner() {
         {banners.map((_, i) => (
           <button
             key={i}
-            onClick={() => setCurrent(i)}
+            onClick={() => { setPrev(current); setCurrent(i) }}
             style={{
               height: 8, borderRadius: 4, border: 'none', cursor: 'pointer',
               background: '#fff', transition: 'all 0.3s',

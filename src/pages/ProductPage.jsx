@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { ShoppingCart, Heart, Star, ArrowLeft, Package, Shield, Truck, RotateCcw } from 'lucide-react'
 import { BsCheckLg } from 'react-icons/bs'
 import { useCart } from '../context/CartContext'
@@ -12,6 +12,7 @@ export default function ProductPage({ products }) {
   const product = products.find(p => p.id === id)
   const { addToCart, toggleWishlist, isInWishlist } = useCart()
   const [added, setAdded] = useState(false)
+  const imgRef = useRef(null)
 
   if (!product) return (
     <div className="container" style={{ paddingTop: 80, textAlign: 'center' }}>
@@ -30,8 +31,22 @@ export default function ProductPage({ products }) {
     setTimeout(() => setAdded(false), 2000)
   }
 
+  // 3D tilt for product image
+  const handleImgMouseMove = (e) => {
+    const el = imgRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width - 0.5
+    const y = (e.clientY - rect.top) / rect.height - 0.5
+    el.style.transform = `perspective(900px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg) scale3d(1.02,1.02,1.02)`
+  }
+
+  const handleImgMouseLeave = () => {
+    if (imgRef.current) imgRef.current.style.transform = 'perspective(900px) rotateY(0deg) rotateX(0deg) scale3d(1,1,1)'
+  }
+
   return (
-    <div className="container" style={{ paddingTop: 28, paddingBottom: 56 }}>
+    <div className="container animate-slide-in-3d" style={{ paddingTop: 28, paddingBottom: 56 }}>
 
       {/* Breadcrumb */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#999', marginBottom: 24 }}>
@@ -47,54 +62,57 @@ export default function ProductPage({ products }) {
 
         {/* LEFT — Image */}
         <div style={{ position: 'relative' }}>
-          {/* Badges */}
           <div style={{ position: 'absolute', top: 14, left: 14, zIndex: 2, display: 'flex', flexDirection: 'column', gap: 6 }}>
             {discount && (
               <span style={{ background: '#ef4444', color: '#fff', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 8 }}>-{discount}%</span>
             )}
             {product.isNew && (
-              <span style={{ background: '#10b981', color: '#fff', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 8 }}>Новинка</span>
+              <span className="animate-badge-bounce" style={{ display: 'inline-block', background: '#10b981', color: '#fff', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 8 }}>Новинка</span>
             )}
           </div>
 
-          <div style={{ borderRadius: 16, overflow: 'hidden', background: '#f8f8f8', aspectRatio: '1/1' }}>
+          <div
+            ref={imgRef}
+            onMouseMove={handleImgMouseMove}
+            onMouseLeave={handleImgMouseLeave}
+            style={{
+              borderRadius: 16, overflow: 'hidden', background: '#f8f8f8', aspectRatio: '1/1',
+              transition: 'transform 0.15s ease-out',
+              transformStyle: 'preserve-3d',
+              boxShadow: '0 8px 40px rgba(0,0,0,0.1)',
+              cursor: 'grab',
+            }}
+          >
             <img
               src={product.images[0]}
               alt={product.title}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
+            {/* Sheen */}
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 60%)', pointerEvents: 'none' }} />
           </div>
         </div>
 
         {/* RIGHT — Details */}
         <div style={{ display: 'flex', flexDirection: 'column' }}>
 
-          {/* Brand */}
           <span style={{ fontSize: 13, color: '#aaa', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8 }}>
             {product.brand}
           </span>
 
-          {/* Title */}
           <h1 style={{ fontSize: 26, fontWeight: 800, color: '#111', lineHeight: 1.3, marginBottom: 14 }}>
             {product.title}
           </h1>
 
-          {/* Rating */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
             <div style={{ display: 'flex', gap: 2 }}>
               {[1,2,3,4,5].map(s => (
-                <Star
-                  key={s}
-                  size={18}
-                  fill={s <= Math.round(product.rating) ? '#FBBF24' : 'none'}
-                  color={s <= Math.round(product.rating) ? '#FBBF24' : '#ddd'}
-                />
+                <Star key={s} size={18} fill={s <= Math.round(product.rating) ? '#FBBF24' : 'none'} color={s <= Math.round(product.rating) ? '#FBBF24' : '#ddd'} />
               ))}
             </div>
             <span style={{ fontSize: 14, color: '#888', fontWeight: 500 }}>{product.rating} / 5</span>
           </div>
 
-          {/* Price */}
           <div style={{ marginBottom: 20 }}>
             {product.discountPrice ? (
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
@@ -106,7 +124,6 @@ export default function ProductPage({ products }) {
             )}
           </div>
 
-          {/* Stock */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
             <Package size={16} color={product.stock > 10 ? '#10b981' : '#f97316'} />
             <span style={{ fontSize: 14, fontWeight: 600, color: product.stock > 10 ? '#10b981' : '#f97316' }}>
@@ -114,7 +131,6 @@ export default function ProductPage({ products }) {
             </span>
           </div>
 
-          {/* Description */}
           <p style={{ fontSize: 14, color: '#666', lineHeight: 1.7, marginBottom: 28 }}>
             {product.description}
           </p>
@@ -129,9 +145,10 @@ export default function ProductPage({ products }) {
                 fontSize: 15, fontWeight: 700, transition: 'all 0.2s',
                 background: added ? '#10b981' : '#7B2FBE',
                 color: '#fff',
+                boxShadow: added ? '0 6px 24px rgba(16,185,129,0.4)' : '0 6px 24px rgba(123,47,190,0.35)',
               }}
-              onMouseEnter={e => { if (!added) e.currentTarget.style.background = '#5a1f8a' }}
-              onMouseLeave={e => { if (!added) e.currentTarget.style.background = '#7B2FBE' }}
+              onMouseEnter={e => { if (!added) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 32px rgba(123,47,190,0.5)' } }}
+              onMouseLeave={e => { if (!added) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(123,47,190,0.35)' } }}
             >
               {added ? <BsCheckLg size={18} /> : <ShoppingCart size={18} />}
               {added ? 'Добавлено в корзину' : 'В корзину'}
@@ -140,13 +157,14 @@ export default function ProductPage({ products }) {
             <button
               onClick={() => toggleWishlist(product)}
               style={{
-                width: 52, height: 52, borderRadius: 14, border: `2px solid ${inWishlist ? '#ef4444' : '#e5e5e5'}`,
+                width: 52, height: 52, borderRadius: 14,
+                border: `2px solid ${inWishlist ? '#ef4444' : '#e5e5e5'}`,
                 background: inWishlist ? '#FEF2F2' : '#fff',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', transition: 'all 0.2s', flexShrink: 0
+                cursor: 'pointer', transition: 'all 0.2s', flexShrink: 0,
               }}
-              onMouseEnter={e => { if (!inWishlist) e.currentTarget.style.borderColor = '#7B2FBE' }}
-              onMouseLeave={e => { if (!inWishlist) e.currentTarget.style.borderColor = '#e5e5e5' }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.1) rotate(5deg)' }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1) rotate(0deg)' }}
             >
               <Heart size={20} fill={inWishlist ? '#ef4444' : 'none'} color={inWishlist ? '#ef4444' : '#aaa'} />
             </button>
@@ -159,10 +177,16 @@ export default function ProductPage({ products }) {
               { Icon: Shield, label: 'Гарантия качества' },
               { Icon: RotateCcw, label: 'Возврат 14 дней' },
             ].map(({ Icon, label }) => (
-              <div key={label} style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-                background: '#f8f5ff', borderRadius: 14, padding: '16px 8px', textAlign: 'center'
-              }}>
+              <div
+                key={label}
+                style={{
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+                  background: '#f8f5ff', borderRadius: 14, padding: '16px 8px', textAlign: 'center',
+                  transition: 'transform 0.25s, box-shadow 0.25s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px) scale(1.04)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(123,47,190,0.15)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0) scale(1)'; e.currentTarget.style.boxShadow = 'none' }}
+              >
                 <Icon size={22} color="#7B2FBE" />
                 <span style={{ fontSize: 12, color: '#555', fontWeight: 500 }}>{label}</span>
               </div>

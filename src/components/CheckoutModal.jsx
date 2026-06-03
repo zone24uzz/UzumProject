@@ -3,6 +3,8 @@ import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-le
 import { X, MapPin, Phone, Navigation, CreditCard, CheckCircle } from 'lucide-react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { useAuth } from '../context/AuthContext'
+import { notifyOrderPlaced, notifyAdminNewOrder } from '../services/telegramBot'
 
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
@@ -16,12 +18,13 @@ const POINTS=[{id:1,name:'Uzum — Chilanзар',address:'ул. Катартал
 function km(la1,ln1,la2,ln2){const R=6371,dL=(la2-la1)*Math.PI/180,dN=(ln2-ln1)*Math.PI/180;const a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dN/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))}
 function FlyTo({pos}){const map=useMap();useEffect(()=>{if(pos)map.flyTo(pos,14,{duration:1.2})},[pos]);return null}
 const fmt=p=>new Intl.NumberFormat('ru-UZ').format(p)+' сум'
-const fCard=v=>v.replace(/D/g,'').slice(0,16).replace(/(.{4})/g,'$1 ').trim()
-const fExp=v=>{const d=v.replace(/D/g,'').slice(0,4);return d.length>2?d.slice(0,2)+'/'+d.slice(2):d}
-const fPhone=v=>{const d=v.replace(/D/g,'').slice(0,12);if(d.length<=3)return'+'+d;if(d.length<=5)return'+'+d.slice(0,3)+' '+d.slice(3);if(d.length<=7)return'+'+d.slice(0,3)+' '+d.slice(3,5)+' '+d.slice(5);if(d.length<=9)return'+'+d.slice(0,3)+' '+d.slice(3,5)+' '+d.slice(5,7)+' '+d.slice(7);return'+'+d.slice(0,3)+' '+d.slice(3,5)+' '+d.slice(5,7)+' '+d.slice(7,9)+' '+d.slice(9)}
+const fCard=v=>v.replace(/\D/g,'').slice(0,16).replace(/(.{4})/g,'$1 ').trim()
+const fExp=v=>{const d=v.replace(/\D/g,'').slice(0,4);return d.length>2?d.slice(0,2)+'/'+d.slice(2):d}
+const fPhone=v=>{const d=v.replace(/\D/g,'').slice(0,12);if(d.length<=3)return'+'+d;if(d.length<=5)return'+'+d.slice(0,3)+' '+d.slice(3);if(d.length<=7)return'+'+d.slice(0,3)+' '+d.slice(3,5)+' '+d.slice(5);if(d.length<=9)return'+'+d.slice(0,3)+' '+d.slice(3,5)+' '+d.slice(5,7)+' '+d.slice(7);return'+'+d.slice(0,3)+' '+d.slice(3,5)+' '+d.slice(5,7)+' '+d.slice(7,9)+' '+d.slice(9)}
 
 
-export default function CheckoutModal({ total, onClose, onSuccess }) {
+export default function CheckoutModal({ total, items = [], onClose, onSuccess, onClearCart }) {
+  const { user } = useAuth()
   const [step, setStep] = useState(1)
   const [pos, setPos] = useState(null)
   const [locating, setLocating] = useState(false)
@@ -47,10 +50,36 @@ export default function CheckoutModal({ total, onClose, onSuccess }) {
     )
   }
 
-  const pay = e => {
+  const pay = async e => {
     e.preventDefault()
     setPaying(true)
-    setTimeout(() => { setPaying(false); onSuccess() }, 1800)
+
+    // Формируем объект заказа
+    const order = {
+      id: Date.now().toString().slice(-8),
+      items: items || [],
+      total,
+      pickup: sel,
+      phone,
+      userName: user?.name || 'Гость',
+      status: 'placed',
+      createdAt: new Date().toISOString(),
+    }
+
+    // Имитация обработки платежа
+    await new Promise(r => setTimeout(r, 1800))
+
+    // Отправляем Telegram-уведомления
+    if (user?.telegramId && user?.tgNotifications) {
+      notifyOrderPlaced(user.telegramId, order)
+    }
+    notifyAdminNewOrder({ ...order, userEmail: user?.email })
+
+    // Очистить корзину
+    if (onClearCart) onClearCart()
+
+    setPaying(false)
+    onSuccess(order)
   }
 
   const S = (base, override = {}) => ({ ...base, ...override })
