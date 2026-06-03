@@ -3,11 +3,13 @@ import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from 'lucide-react'
 import { BsCheckCircleFill } from 'react-icons/bs'
 import { useCart } from '../context/CartContext'
 import { useState } from 'react'
+import CheckoutModal from '../components/CheckoutModal'
 
 const fmt = (p) => new Intl.NumberFormat('ru-UZ').format(p) + ' сум'
 
 export default function CartPage() {
   const { cartItems, removeFromCart, updateQty, cartTotal } = useCart()
+  const [showModal, setShowModal] = useState(false)
   const [ordered, setOrdered] = useState(false)
 
   if (ordered) return (
@@ -35,9 +37,11 @@ export default function CartPage() {
   )
 
   const delivery = cartTotal >= 500000 ? 0 : 25000
+  const total = cartTotal + delivery
 
   return (
     <div className="container" style={{ paddingTop: 32, paddingBottom: 48 }}>
+      {/* Breadcrumb */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#999', marginBottom: 24 }}>
         <Link to="/" style={{ color: '#7B2FBE', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
           <ArrowLeft size={14} /> Главная
@@ -53,7 +57,7 @@ export default function CartPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {cartItems.map(item => (
             <div key={item.id} style={{ background: '#fff', borderRadius: 16, padding: 16, display: 'flex', gap: 16, alignItems: 'center', boxShadow: '0 1px 6px rgba(0,0,0,0.06)' }}>
-              <Link to={`/product/${item.id}`} style={{ width: 80, height: 80, flexShrink: 0, borderRadius: 12, overflow: 'hidden', background: '#f5f5f5' }}>
+              <Link to={`/product/${item.id}`} style={{ width: 80, height: 80, flexShrink: 0, borderRadius: 12, overflow: 'hidden', background: '#f5f5f5', display: 'block' }}>
                 <img src={item.images[0]} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </Link>
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -85,7 +89,7 @@ export default function CartPage() {
         </div>
 
         {/* Summary */}
-        <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 1px 6px rgba(0,0,0,0.06)', position: 'sticky', top: 100 }}>
+        <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 1px 6px rgba(0,0,0,0.06)', position: 'sticky', top: 100, alignSelf: 'start' }}>
           <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20 }}>Итого</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14, color: '#555' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -98,23 +102,31 @@ export default function CartPage() {
                 {delivery === 0 ? 'Бесплатно' : fmt(delivery)}
               </span>
             </div>
-            {delivery > 0 && (
-              <p style={{ fontSize: 12, color: '#aaa' }}>Бесплатная доставка от 500 000 сум</p>
-            )}
+            {delivery > 0 && <p style={{ fontSize: 12, color: '#aaa' }}>Бесплатная доставка от 500 000 сум</p>}
           </div>
           <div style={{ borderTop: '1px solid #f0f0f0', margin: '16px 0', paddingTop: 16, display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: 16 }}>
             <span>К оплате</span>
-            <span style={{ color: '#7B2FBE' }}>{fmt(cartTotal + delivery)}</span>
+            <span style={{ color: '#7B2FBE' }}>{fmt(total)}</span>
           </div>
           <button
-            onClick={() => setOrdered(true)}
-            className="btn-purple"
-            style={{ width: '100%', padding: '14px 0', borderRadius: 12, fontSize: 15, fontWeight: 700 }}
+            onClick={() => setShowModal(true)}
+            style={{ width: '100%', padding: '14px 0', borderRadius: 12, border: 'none', background: '#7B2FBE', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', transition: 'background 0.2s' }}
+            onMouseEnter={e => e.currentTarget.style.background = '#5a1f8a'}
+            onMouseLeave={e => e.currentTarget.style.background = '#7B2FBE'}
           >
             Оформить заказ
           </button>
         </div>
       </div>
+
+      {/* Checkout Modal */}
+      {showModal && (
+        <CheckoutModal
+          total={total}
+          onClose={() => setShowModal(false)}
+          onSuccess={() => { setShowModal(false); setOrdered(true) }}
+        />
+      )}
     </div>
   )
 }

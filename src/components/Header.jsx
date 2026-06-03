@@ -1,16 +1,48 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ShoppingCart, Heart, Search, Menu, MapPin, ChevronDown, User, Phone } from 'lucide-react'
+import { ShoppingCart, Heart, Search, Menu, MapPin, ChevronDown, User, Phone, Check } from 'lucide-react'
 import { useCart } from '../context/CartContext'
+
+const CITIES = [
+  'Ташкент',
+  'Самарканд',
+  'Бухара',
+  'Наманган',
+  'Андижан',
+  'Фергана',
+  'Нукус',
+  'Карши',
+  'Термез',
+  'Коканд',
+]
 
 export default function Header({ categories }) {
   const { cartCount, wishlist } = useCart()
   const [q, setQ] = useState('')
+  const [city, setCity] = useState('Ташкент')
+  const [cityOpen, setCityOpen] = useState(false)
+  const cityRef = useRef(null)
   const navigate = useNavigate()
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (cityRef.current && !cityRef.current.contains(e.target)) {
+        setCityOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
   const handleSearch = (e) => {
     e.preventDefault()
     if (q.trim()) navigate(`/search?q=${encodeURIComponent(q.trim())}`)
+  }
+
+  const selectCity = (c) => {
+    setCity(c)
+    setCityOpen(false)
   }
 
   return (
@@ -19,11 +51,69 @@ export default function Header({ categories }) {
       {/* Top bar */}
       <div style={{ background: '#7B2FBE', color: '#fff', fontSize: 12, padding: '9px 0' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer', opacity: 0.9 }}>
-            <MapPin size={12} />
-            <span style={{ fontWeight: 600 }}>Ташкент</span>
-            <ChevronDown size={11} />
+
+          {/* City selector */}
+          <div ref={cityRef} style={{ position: 'relative' }}>
+            <button
+              onClick={() => setCityOpen(o => !o)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 5,
+                background: 'none', border: 'none', color: '#fff',
+                cursor: 'pointer', fontSize: 12, fontWeight: 600,
+                padding: '2px 6px', borderRadius: 6,
+                transition: 'background 0.15s',
+                background: cityOpen ? 'rgba(255,255,255,0.15)' : 'transparent',
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
+              onMouseLeave={e => { if (!cityOpen) e.currentTarget.style.background = 'transparent' }}
+            >
+              <MapPin size={13} />
+              <span>{city}</span>
+              <ChevronDown
+                size={12}
+                style={{ transition: 'transform 0.2s', transform: cityOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+              />
+            </button>
+
+            {/* Dropdown */}
+            {cityOpen && (
+              <div style={{
+                position: 'absolute', top: 'calc(100% + 8px)', left: 0,
+                background: '#fff', borderRadius: 14,
+                boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+                minWidth: 200, zIndex: 200,
+                overflow: 'hidden',
+                border: '1px solid #f0f0f0',
+              }}>
+                <div style={{ padding: '8px 12px 6px', borderBottom: '1px solid #f5f5f5' }}>
+                  <p style={{ fontSize: 11, color: '#aaa', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    Выберите город
+                  </p>
+                </div>
+                {CITIES.map(c => (
+                  <button
+                    key={c}
+                    onClick={() => selectCity(c)}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      padding: '10px 14px', background: 'none', border: 'none',
+                      fontSize: 13, fontWeight: c === city ? 700 : 400,
+                      color: c === city ? '#7B2FBE' : '#333',
+                      cursor: 'pointer', textAlign: 'left',
+                      transition: 'background 0.15s',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#f8f5ff'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                  >
+                    <span>{c}</span>
+                    {c === city && <Check size={14} color="#7B2FBE" />}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
+
+          {/* Right info */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 20, color: 'rgba(255,255,255,0.85)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
               <Phone size={11} />
@@ -72,10 +162,7 @@ export default function Header({ categories }) {
               value={q}
               onChange={e => setQ(e.target.value)}
               placeholder="Поиск по товарам, брендам..."
-              style={{
-                flex: 1, padding: '10px 16px', fontSize: 14,
-                border: 'none', outline: 'none', background: '#fff', color: '#333'
-              }}
+              style={{ flex: 1, padding: '10px 16px', fontSize: 14, border: 'none', outline: 'none', background: '#fff', color: '#333' }}
             />
             <button
               type="submit"
